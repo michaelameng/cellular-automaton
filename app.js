@@ -4,8 +4,14 @@
 // SimulationState is the mutable bookkeeping (history and current rule) on top.
 
 // Coordinates use (column, row), while the nested array is indexed as [row][column].
-const WIDTH = 27;
-const HEIGHT = 27;
+// The board is always square. WIDTH and HEIGHT track the current side length and
+// change together whenever the user picks a new size; grids read them at call
+// time, so a new size takes effect once the board is rebuilt.
+const DEFAULT_SIZE = 27;
+const MIN_SIZE = 1;
+const MAX_SIZE = 100;
+let WIDTH = DEFAULT_SIZE;
+let HEIGHT = DEFAULT_SIZE;
 const BIRTH_COUNTS = [3];
 const SURVIVAL_COUNTS = [2, 3];
 const MUTATION_PROBABILITY = 0;
@@ -158,6 +164,13 @@ class SimulationState {
     this.mutationProbability = Math.min(1, Math.max(0, probability));
   }
 
+  // Change the (square) board side length, clearing the board to the new size.
+  setSize(size) {
+    WIDTH = size;
+    HEIGHT = size;
+    this.reset();
+  }
+
   asJson() {
     const cells = this.grid.asNumbers();
     return {
@@ -182,6 +195,7 @@ const grid = document.querySelector("#grid");
 const status = document.querySelector("#status");
 const mutationSlider = document.querySelector("#mutation-probability");
 const mutationValue = document.querySelector("#mutation-value");
+const sizeInput = document.querySelector("#board-size");
 const playButton = document.querySelector("#play");
 const playIcon = playButton.innerHTML;
 const pauseIcon =
@@ -277,6 +291,31 @@ mutationSlider.oninput = () => {
   render();
 };
 
+// Match the CSS grid track count to the board's side length.
+function layoutGrid() {
+  grid.style.gridTemplateColumns = `repeat(${WIDTH}, 1fr)`;
+}
+
+sizeInput.oninput = () => {
+  // Only whole numbers within range are valid; anything else leaves the board
+  // untouched and waits for a usable value.
+  const size = Number(sizeInput.value);
+  if (!Number.isInteger(size) || size < MIN_SIZE || size > MAX_SIZE) return;
+  stop();
+  state.setSize(size);
+  layoutGrid();
+  render();
+};
+
+// Snap a partial or out-of-range entry back to the board's current size once
+// the field loses focus, so the input never disagrees with what's on screen.
+sizeInput.onchange = () => {
+  const size = Number(sizeInput.value);
+  if (!Number.isInteger(size) || size < MIN_SIZE || size > MAX_SIZE) {
+    sizeInput.value = String(WIDTH);
+  }
+};
+
 document.querySelector("#step-forward").onclick = () => {
   stop();
   stepForward();
@@ -307,4 +346,5 @@ document.querySelector("#reset").onclick = () => {
 buildRuleCheckboxes("#birth-row", "birth");
 buildRuleCheckboxes("#survival-row", "survival");
 controlButtons.forEach((b) => (b.disabled = false));
+layoutGrid();
 render();
