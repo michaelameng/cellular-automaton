@@ -405,6 +405,7 @@ document.querySelector("#random").onclick = () => {
 };
 document.querySelector("#reset").onclick = () => {
   stop();
+  speedIndex = SPEEDS.indexOf(1);
   state.reset();
   render();
 };
