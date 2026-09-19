@@ -64,23 +64,17 @@ a {
   border-radius: 6px;
 }
 
-#rule-set {
-  display: flex;
+.icon-button {
+  display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0.35rem;
 }
 
-.bs-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-#random-rule {
-  padding: 0.4rem 0.75rem;
-  font-size: 0.9rem;
-  white-space: nowrap;
+.icon-button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  display: block;
 }
 
 .rule-row {

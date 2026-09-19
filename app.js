@@ -196,7 +196,8 @@ const status = document.querySelector("#status");
 const mutationSlider = document.querySelector("#mutation-probability");
 const mutationValue = document.querySelector("#mutation-value");
 const sizeInput = document.querySelector("#board-size");
-const randomRuleButton = document.querySelector("#random-rule");
+const randomBirthButton = document.querySelector("#random-birth");
+const randomSurvivalButton = document.querySelector("#random-survival");
 const playButton = document.querySelector("#play");
 const playIcon = playButton.innerHTML;
 const pauseIcon =
@@ -317,12 +318,18 @@ sizeInput.onchange = () => {
   }
 };
 
-// Pick one of the 2^18 outer-totalistic rules by flipping an independent coin
-// for each of the nine birth and nine survival neighbour counts.
-randomRuleButton.onclick = () => {
-  const randomCounts = () =>
-    Array.from({ length: 9 }, (_, n) => n).filter(() => Math.random() < 0.5);
-  state.setRule(randomCounts(), randomCounts());
+// Flip an independent coin for each of the nine neighbour counts, giving a
+// random set of Birth or Survival counts (one of 2^9 possibilities per row).
+function randomCounts() {
+  return Array.from({ length: 9 }, (_, n) => n).filter(() => Math.random() < 0.5);
+}
+
+randomBirthButton.onclick = () => {
+  state.setRule(randomCounts(), [...state.survivalCounts]);
+  render();
+};
+randomSurvivalButton.onclick = () => {
+  state.setRule([...state.birthCounts], randomCounts());
   render();
 };
 
@@ -355,6 +362,10 @@ document.querySelector("#reset").onclick = () => {
 
 buildRuleCheckboxes("#birth-row", "birth");
 buildRuleCheckboxes("#survival-row", "survival");
+// The buttons live in the markup before the checkboxes are generated; move each
+// to the end of its row so it sits after the counts it randomizes.
+document.querySelector("#birth-row").appendChild(randomBirthButton);
+document.querySelector("#survival-row").appendChild(randomSurvivalButton);
 controlButtons.forEach((b) => (b.disabled = false));
 layoutGrid();
 render();
