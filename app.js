@@ -202,7 +202,24 @@ const playButton = document.querySelector("#play");
 const playIcon = playButton.innerHTML;
 const pauseIcon =
   '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+const stepBackButton = document.querySelector("#step-back");
+const stepForwardButton = document.querySelector("#step-forward");
+// While paused these buttons step; while playing they change speed, so keep
+// each button's default (step) icon and the fast-forward/rewind icons it swaps
+// to on hand.
+const stepBackIcon = stepBackButton.innerHTML;
+const stepForwardIcon = stepForwardButton.innerHTML;
+const slowerIcon =
+  '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>';
+const fasterIcon =
+  '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>';
 const controlButtons = [...document.querySelectorAll("#controls button")];
+
+// Playback speed as a multiple of the base cadence; the interval shrinks as the
+// multiplier grows. Index into SPEEDS starts at 1x.
+const SPEEDS = [0.5, 1, 2, 4, 8];
+const BASE_INTERVAL = 450;
+let speedIndex = SPEEDS.indexOf(1);
 
 const state = new SimulationState();
 let timer = null;
@@ -267,7 +284,7 @@ function render() {
       }),
     ),
   );
-  status.textContent = `step: ${view.generation} · living cells: ${view.livingCells}`;
+  status.textContent = `step: ${view.generation} · speed: ${SPEEDS[speedIndex]}x · living cells: ${view.livingCells}`;
   syncRuleCheckboxes(view.birth, view.survival);
   syncMutationSlider(view.mutationProbability);
 }
@@ -278,6 +295,35 @@ function stop() {
   playButton.innerHTML = playIcon;
   playButton.title = "Play";
   playButton.setAttribute("aria-label", "Play");
+  syncStepButtons();
+}
+
+// Swap the step buttons between stepping (paused) and speed control (playing).
+function syncStepButtons() {
+  const playing = Boolean(timer);
+  stepBackButton.innerHTML = playing ? slowerIcon : stepBackIcon;
+  stepBackButton.title = playing ? "Slow down" : "Step back";
+  stepBackButton.setAttribute("aria-label", playing ? "Slow down" : "Step back");
+  stepForwardButton.innerHTML = playing ? fasterIcon : stepForwardIcon;
+  stepForwardButton.title = playing ? "Speed up" : "Step forward";
+  stepForwardButton.setAttribute(
+    "aria-label",
+    playing ? "Speed up" : "Step forward",
+  );
+}
+
+// (Re)start the play loop at the current speed's interval.
+function startTimer() {
+  clearInterval(timer);
+  timer = setInterval(stepForward, BASE_INTERVAL / SPEEDS[speedIndex]);
+}
+
+// Nudge the speed one step within range; while playing, retime the loop so the
+// change takes effect immediately.
+function changeSpeed(delta) {
+  speedIndex = Math.min(SPEEDS.length - 1, Math.max(0, speedIndex + delta));
+  if (timer) startTimer();
+  render();
 }
 
 function stepForward() {
@@ -333,21 +379,24 @@ randomSurvivalButton.onclick = () => {
   render();
 };
 
-document.querySelector("#step-forward").onclick = () => {
-  stop();
+stepForwardButton.onclick = () => {
+  // Speed up while playing; step forward while paused.
+  if (timer) return changeSpeed(1);
   stepForward();
 };
-document.querySelector("#step-back").onclick = () => {
-  stop();
+stepBackButton.onclick = () => {
+  // Slow down while playing; step back while paused.
+  if (timer) return changeSpeed(-1);
   state.stepBack();
   render();
 };
 playButton.onclick = () => {
   if (timer) return stop();
-  timer = setInterval(stepForward, 450);
+  startTimer();
   playButton.innerHTML = pauseIcon;
   playButton.title = "Pause";
   playButton.setAttribute("aria-label", "Pause");
+  syncStepButtons();
 };
 document.querySelector("#random").onclick = () => {
   stop();
