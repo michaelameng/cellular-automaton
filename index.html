@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cellular Automata</title>
+    <title>Cellular Automaton</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main>
-      <h1>Cellular Automata</h1>
+      <h1>Cellular Automaton</h1>
       <p>
         Click cells to turn them on, then set the rules that drive the
         simulation. Birth (B) picks how many of a cell's eight neighbors must be
@@ -19,16 +19,29 @@
       <p>
         Mutation adds a dash of chance: after each step, every cell flips on or
         off with the probability you set, so 0% follows the rules exactly and
-        higher values keep the board restless. The buttons just above the grid
-        let you step through generations, play or pause the simulation, drop in
-        a random board, and reset to a blank grid, respectively.
+        higher values keep the board restless. And you can change the board size
+        just below. The buttons just above the grid let you step through
+        generations, play or pause the simulation, drop in a random board, and
+        reset to a blank grid, respectively.
       </p>
       <div id="rule-picker">
-        <div class="rule-row" id="birth-row">
-          <span class="label">Birth</span>
-        </div>
-        <div class="rule-row" id="survival-row">
-          <span class="label">Survival</span>
+        <div id="rule-set">
+          <div class="bs-rows">
+            <div class="rule-row" id="birth-row">
+              <span class="label">Birth</span>
+            </div>
+            <div class="rule-row" id="survival-row">
+              <span class="label">Survival</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="random-rule"
+            title="Random rule"
+            aria-label="Random rule"
+          >
+            🎲 Random
+          </button>
         </div>
         <div class="rule-row" id="mutation-row">
           <span class="label">Mutation</span>
@@ -41,9 +54,7 @@
             value="0"
           />
           <span id="mutation-value">0%</span>
-        </div>
-        <div class="rule-row" id="size-row">
-          <span class="label">Size</span>
+          <span class="label" id="size-label">Size</span>
           <input
             type="number"
             id="board-size"

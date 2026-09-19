@@ -64,6 +64,25 @@ a {
   border-radius: 6px;
 }
 
+#rule-set {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bs-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#random-rule {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
 .rule-row {
   display: flex;
   align-items: center;
@@ -96,7 +115,12 @@ a {
   color: var(--ink);
 }
 
-#size-row input[type="number"] {
+#size-label {
+  min-width: auto;
+  margin-left: 0.75rem;
+}
+
+#mutation-row input[type="number"] {
   width: 4.5rem;
   padding: 0.3rem 0.5rem;
   border: 1px solid var(--line);

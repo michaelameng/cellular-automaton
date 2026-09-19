@@ -196,6 +196,7 @@ const status = document.querySelector("#status");
 const mutationSlider = document.querySelector("#mutation-probability");
 const mutationValue = document.querySelector("#mutation-value");
 const sizeInput = document.querySelector("#board-size");
+const randomRuleButton = document.querySelector("#random-rule");
 const playButton = document.querySelector("#play");
 const playIcon = playButton.innerHTML;
 const pauseIcon =
@@ -314,6 +315,15 @@ sizeInput.onchange = () => {
   if (!Number.isInteger(size) || size < MIN_SIZE || size > MAX_SIZE) {
     sizeInput.value = String(WIDTH);
   }
+};
+
+// Pick one of the 2^18 outer-totalistic rules by flipping an independent coin
+// for each of the nine birth and nine survival neighbour counts.
+randomRuleButton.onclick = () => {
+  const randomCounts = () =>
+    Array.from({ length: 9 }, (_, n) => n).filter(() => Math.random() < 0.5);
+  state.setRule(randomCounts(), randomCounts());
+  render();
 };
 
 document.querySelector("#step-forward").onclick = () => {
