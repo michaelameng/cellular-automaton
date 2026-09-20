@@ -216,8 +216,9 @@ const fasterIcon =
 const controlButtons = [...document.querySelectorAll("#controls button")];
 
 // Playback speed as a multiple of the base cadence; the interval shrinks as the
-// multiplier grows. Index into SPEEDS starts at 1x.
-const SPEEDS = [0.5, 1, 2, 4, 8];
+// multiplier grows. Speeding up steps 1x through 10x one at a time; slowing down
+// bottoms out at 0.5x. Index into SPEEDS starts at 1x.
+const SPEEDS = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const BASE_INTERVAL = 450;
 let speedIndex = SPEEDS.indexOf(1);
 
