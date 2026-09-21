@@ -1,6 +1,7 @@
-// A small, browser-viewable outer-totalistic cellular automaton (default
-// B3/S23, Conway's Game of Life). This is a straight JavaScript port of the
-// original Python model: LifeGrid holds one immutable generation, and
+// A small, browser-viewable outer-totalistic cellular automaton (default rule
+// is empty, so no births or survivals until counts are picked). This is a
+// straight JavaScript port of the original Python model: LifeGrid holds one
+// immutable generation, and
 // SimulationState is the mutable bookkeeping (history and current rule) on top.
 
 // Coordinates use (column, row), while the nested array is indexed as [row][column].
@@ -12,8 +13,8 @@ const MIN_SIZE = 1;
 const MAX_SIZE = 100;
 let WIDTH = DEFAULT_SIZE;
 let HEIGHT = DEFAULT_SIZE;
-const BIRTH_COUNTS = [3];
-const SURVIVAL_COUNTS = [2, 3];
+const BIRTH_COUNTS = [];
+const SURVIVAL_COUNTS = [];
 const MUTATION_PROBABILITY = 0;
 
 // A generation of cells as a HEIGHT-by-WIDTH grid of booleans. Each method
