@@ -198,6 +198,8 @@ const mutationValue = document.querySelector("#mutation-value");
 const sizeInput = document.querySelector("#board-size");
 const randomBirthButton = document.querySelector("#random-birth");
 const randomSurvivalButton = document.querySelector("#random-survival");
+const resetBirthButton = document.querySelector("#reset-birth");
+const resetSurvivalButton = document.querySelector("#reset-survival");
 const playButton = document.querySelector("#play");
 const playIcon = playButton.innerHTML;
 const pauseIcon =
@@ -380,6 +382,15 @@ randomSurvivalButton.onclick = () => {
   render();
 };
 
+resetBirthButton.onclick = () => {
+  state.setRule([...BIRTH_COUNTS], [...state.survivalCounts]);
+  render();
+};
+resetSurvivalButton.onclick = () => {
+  state.setRule([...state.birthCounts], [...SURVIVAL_COUNTS]);
+  render();
+};
+
 stepForwardButton.onclick = () => {
   // Speed up while playing; step forward while paused.
   if (timer) return changeSpeed(1);
@@ -414,9 +425,12 @@ document.querySelector("#reset").onclick = () => {
 buildRuleCheckboxes("#birth-row", "birth");
 buildRuleCheckboxes("#survival-row", "survival");
 // The buttons live in the markup before the checkboxes are generated; move each
-// to the end of its row so it sits after the counts it randomizes.
-document.querySelector("#birth-row").appendChild(randomBirthButton);
-document.querySelector("#survival-row").appendChild(randomSurvivalButton);
+// to the end of its row so the random button sits after the counts it randomizes
+// and the reset button sits to its right.
+document.querySelector("#birth-row").append(randomBirthButton, resetBirthButton);
+document
+  .querySelector("#survival-row")
+  .append(randomSurvivalButton, resetSurvivalButton);
 controlButtons.forEach((b) => (b.disabled = false));
 layoutGrid();
 render();

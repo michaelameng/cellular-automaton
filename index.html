@@ -9,21 +9,6 @@
   <body>
     <main>
       <h1>Cellular Automaton</h1>
-      <p>
-        Click cells to turn them on, then set the rules that drive the
-        simulation. Birth (B) picks how many of a cell's eight neighbors must be
-        on for it to switch on, and Survival (S) picks how many must be on for
-        it to stay on. Choose several counts in either category and they combine
-        with a logical <code>OR</code>.
-      </p>
-      <p>
-        Mutation adds a dash of chance: after each step, every cell flips on or
-        off with the probability you set, so 0% follows the rules exactly and
-        higher values keep the board restless. And you can change the board size
-        just below. The buttons just above the grid let you step through
-        generations, play or pause the simulation, drop in a random board, and
-        reset to a blank grid, respectively.
-      </p>
       <div id="rule-picker">
         <div class="rule-row" id="birth-row">
           <span class="label">Birth</span>
@@ -44,10 +29,53 @@
             >
               <rect x="3" y="3" width="18" height="18" rx="3" />
               <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+              <circle
+                cx="16"
+                cy="16"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="8"
+                cy="16"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="16"
+                cy="8"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="reset-birth"
+            class="icon-button"
+            title="Reset birth rule"
+            aria-label="Reset birth rule"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
           </button>
         </div>
@@ -70,10 +98,53 @@
             >
               <rect x="3" y="3" width="18" height="18" rx="3" />
               <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
-              <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+              <circle
+                cx="16"
+                cy="16"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="8"
+                cy="16"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+              <circle
+                cx="16"
+                cy="8"
+                r="1.2"
+                fill="currentColor"
+                stroke="none"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="reset-survival"
+            class="icon-button"
+            title="Reset survival rule"
+            aria-label="Reset survival rule"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
             </svg>
           </button>
         </div>
