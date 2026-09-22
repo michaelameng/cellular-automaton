@@ -132,6 +132,20 @@ class SimulationState {
     if (this.genIndex > 0) this.genIndex -= 1;
   }
 
+  // Jump straight to a chosen generation, computing (and caching) any future
+  // states that don't exist yet, so typing a step number behaves like stepping
+  // forward or back to it.
+  goToGeneration(target) {
+    target = Math.max(0, Math.floor(target));
+    while (this.history.length <= target) {
+      const nextGrid = this.history[this.history.length - 1]
+        .step([...this.birthCounts], [...this.survivalCounts])
+        .mutate(this.mutationProbability);
+      this.history.push(nextGrid);
+    }
+    this.genIndex = target;
+  }
+
   toggle(column, row) {
     if (column < 0 || column >= WIDTH || row < 0 || row >= HEIGHT) return;
     const cells = this.grid.cells.map((r) => [...r]);
@@ -194,6 +208,13 @@ class SimulationState {
 
 const grid = document.querySelector("#grid");
 const status = document.querySelector("#status");
+// The step and speed readouts double as inline editors: clicking one swaps its
+// text for a number input. Built once and reused so an in-progress edit isn't
+// wiped out by a re-render.
+const stepValue = document.createElement("span");
+const speedValue = document.createElement("span");
+const livingValue = document.createElement("span");
+let editingValue = null; // the value span currently being edited, if any
 const mutationSlider = document.querySelector("#mutation-probability");
 const mutationValue = document.querySelector("#mutation-value");
 const sizeInput = document.querySelector("#board-size");
@@ -288,7 +309,12 @@ function render() {
       }),
     ),
   );
-  status.textContent = `step: ${view.generation} · speed: ${SPEEDS[speedIndex]}x · living cells: ${view.livingCells}`;
+  // Leave the value being edited alone so typing isn't clobbered mid-edit.
+  if (editingValue !== stepValue) stepValue.textContent = view.generation;
+  // The "x" is a stylistic suffix so the whole "5x" reads as one clickable
+  // target; the edited/stored value stays the bare number.
+  if (editingValue !== speedValue) speedValue.textContent = `${SPEEDS[speedIndex]}x`;
+  livingValue.textContent = view.livingCells;
   syncRuleCheckboxes(view.birth, view.survival);
   syncMutationSlider(view.mutationProbability);
 }
@@ -334,6 +360,98 @@ function stepForward() {
   state.stepForward();
   render();
 }
+
+// Snap an arbitrary typed speed to the closest supported multiplier and retime
+// the loop if it's running.
+function setSpeedToNearest(value) {
+  let nearest = 0;
+  for (let i = 1; i < SPEEDS.length; i++) {
+    if (Math.abs(SPEEDS[i] - value) < Math.abs(SPEEDS[nearest] - value)) {
+      nearest = i;
+    }
+  }
+  speedIndex = nearest;
+  if (timer) startTimer();
+}
+
+// Assemble the status line with the step and speed numbers as their own spans so
+// each can be turned into an inline editor on click.
+function buildStatus() {
+  status.replaceChildren(
+    document.createTextNode("step: "),
+    stepValue,
+    document.createTextNode(" · speed: "),
+    speedValue,
+    document.createTextNode(" · living cells: "),
+    livingValue,
+  );
+}
+
+// Swap a value span for a number input, committing the typed value on Enter or
+// blur and discarding it on Escape.
+function editValue(span, current, { min, step, commit }) {
+  if (editingValue) return;
+  const input = document.createElement("input");
+  input.type = "number";
+  input.className = "status-input";
+  input.value = current;
+  input.min = min;
+  input.step = step;
+  span.replaceChildren(input);
+  editingValue = span;
+  input.focus();
+  input.select();
+
+  const finish = (save) => {
+    if (editingValue !== span) return;
+    editingValue = null;
+    if (save && input.value !== "" && !Number.isNaN(Number(input.value))) {
+      commit(Number(input.value));
+    }
+    render();
+  };
+  input.onblur = () => finish(true);
+  input.onkeydown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      input.blur();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  };
+}
+
+function makeValueEditable(span, open) {
+  span.className = "status-value";
+  span.tabIndex = 0;
+  span.title = "Click to edit";
+  span.onclick = open;
+  span.onkeydown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      open();
+    }
+  };
+}
+
+makeValueEditable(stepValue, () =>
+  editValue(stepValue, state.genIndex, {
+    min: 0,
+    step: 1,
+    commit: (n) => {
+      stop();
+      state.goToGeneration(n);
+    },
+  }),
+);
+makeValueEditable(speedValue, () =>
+  editValue(speedValue, SPEEDS[speedIndex], {
+    min: 0,
+    step: 0.5,
+    commit: setSpeedToNearest,
+  }),
+);
 
 mutationSlider.oninput = () => {
   if (applyingRemoteRule) return;
@@ -433,5 +551,6 @@ document
   .querySelector("#survival-row")
   .append(randomSurvivalButton, resetSurvivalButton);
 controlButtons.forEach((b) => (b.disabled = false));
+buildStatus();
 layoutGrid();
 render();
