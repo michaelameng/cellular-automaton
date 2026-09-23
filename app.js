@@ -8,7 +8,7 @@
 // The board is always square. WIDTH and HEIGHT track the current side length and
 // change together whenever the user picks a new size; grids read them at call
 // time, so a new size takes effect once the board is rebuilt.
-const DEFAULT_SIZE = 27;
+const DEFAULT_SIZE = 10;
 const MIN_SIZE = 1;
 const MAX_SIZE = 100;
 let WIDTH = DEFAULT_SIZE;
@@ -414,7 +414,7 @@ function editValue(span, current, { min, step, commit }) {
   input.onkeydown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      input.blur();
+      finish(true);
     } else if (event.key === "Escape") {
       event.preventDefault();
       finish(false);
