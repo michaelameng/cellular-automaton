@@ -412,12 +412,12 @@ function editValue(span, current, { min, step, commit }) {
   };
   input.onblur = () => finish(true);
   input.onkeydown = (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" || event.key === "Escape") {
       event.preventDefault();
-      finish(true);
-    } else if (event.key === "Escape") {
-      event.preventDefault();
-      finish(false);
+      // Keep the keypress from bubbling to the span's own Enter handler,
+      // which would immediately reopen the editor we're closing.
+      event.stopPropagation();
+      finish(event.key === "Enter");
     }
   };
 }
